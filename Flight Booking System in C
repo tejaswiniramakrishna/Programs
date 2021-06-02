@@ -1,0 +1,210 @@
+// the code below deals with the implementation of a flight a booking system .
+#include<stdio.h>
+#include<stdlib.h>
+#include<conio.h>
+#include<string.h>
+
+
+
+struct air_india
+{
+	char passport[6];
+	char name[15];
+	int seat_num;
+	char email[15];
+	int phone[10];
+	char flight[10];
+	char dest[11];
+	char date[8];
+	struct air_india *next;
+}
+*head, *cur;
+struct air_india *temp;
+void reserve(int x), cancel(), display(), savefile();
+char freturn;
+
+void main()
+{
+
+
+
+	int choice;
+	head = cur = NULL;
+	int num = 1;
+	do
+	{
+
+		printf("\n\n\t\t *********************************************************");
+		printf("\n\t\t                   Welcome to Air India!!                   ");
+		printf("\n\n\t\t *********************************************************");
+		printf("\n\n\n\t\t Please enter your choice from (1-4):");
+		printf("\n\n\t\t 1. RESERVATION");
+		printf("\n\n\t\t 2. CANCELLATION");
+		printf("\n\n\t\t 3. DISPLAY RECORDS");
+		printf("\n\n\t\t 4. EXIT");
+		printf("\n\n\t\t Feel free to ask us anything");
+		printf("\n\n\t\t Enter Your Choice: ");
+
+
+
+		scanf("%d", &choice); fflush(stdin);
+		switch (choice)
+		{
+		case 1:
+			reserve(num);
+			num++;
+			break;
+		case 2:
+			cancel();
+			break;
+		case 3:
+			display();
+			break;
+		case 4:
+		{
+				  savefile();
+				  break;
+		}
+		default:
+			printf("\n\n\t SORRY INVALID CHOICE!");
+			printf("\n\n\t PLEASE CHOOSE FROM 1-4");
+			printf("\n\n\t Do not forget to chose from 1-4");
+		}
+		getch();
+	} while (choice != 4);
+}
+// Entering the details of the passenger
+void details()
+{
+	printf("\n\t Enter your passport number: ");
+	gets(cur->passport); fflush(stdin);
+	printf("\n\t Enter your  name: ");
+	gets(cur->name); fflush(stdin);
+	printf("\n\t Enter your email address: ");
+	gets(cur->email); fflush(stdin);
+	printf("\n\t Enter your phone number: ");
+	gets(cur->phone); fflush(stdin);
+	printf("\n\t Enter the type of flight required:\n\t 1.Economy\n\t 2. Business\n ");
+	gets(cur->flight); fflush(stdin);
+	printf("\n\t Please enter your destination: ");
+	gets(cur->dest); fflush(stdin);
+	printf("\n\t Please enter the date you want to board the flight in dd/mm/yyyy: ");
+	gets(cur->date); fflush(stdin);
+
+}
+// Checking if the seat booking is successful or not
+void reserve(int x)
+{
+	cur = head;
+	if (head == NULL)
+	{
+		// first user
+		head = cur = (struct air_india*)malloc(sizeof(struct air_india));
+		details();
+		cur->next = NULL;
+		printf("\n\t Seat booking successful!");
+		printf("\n\t Your seat number is: Seat A-%d", x);
+		cur->seat_num = x;
+		return;
+	}
+	else if (x > 15) // FULL SEATS
+	{
+		printf("\n\t\t Seat Full.");
+		printf("\n\t\t Sorry..No flights available today");
+		return;
+	}
+	else
+	{
+		// next user
+		while (cur->next)
+		cur = cur->next;
+		cur->next = (struct air_india *)malloc(sizeof(struct air_india));
+		cur = cur->next;
+		details();
+		cur->next = NULL;
+		printf("\n\t Seat booking successful!");
+		printf("\n\t Your seat number is: Seat A-%d", x);
+		cur->seat_num = x;
+		return;
+	}
+}
+// Saving the entered details of the passenger
+void savefile()
+{
+	FILE *fpointer = fopen("Air India Records", "w");
+	if (!fpointer)
+	{
+		printf("\n Error in opening file!");
+		return;
+	}
+	cur = head;
+	while (cur)
+	{
+		fprintf(fpointer, "%-6s", cur->passport);
+		fprintf(fpointer, "%-15s", cur->name);
+		fprintf(fpointer, "%-15s", cur->email);
+		fprintf(fpointer, "%-15d", cur->phone);
+		fprintf(fpointer, "%-15s", cur->flight);
+		fprintf(fpointer, "%-15s", cur->dest);
+		fprintf(fpointer, "%-15s", cur->date);
+		cur = cur->next;
+	}
+	printf("\n\n\t Details have been saved to a file (air india records)\n");
+	// if the passenger wants to book a return flight
+	printf("\n\n\t Do you want to book a return flight??\n");
+	scanf("%c",&freturn);
+	printf("\n\n\t Have A Great Day!!");
+	fclose(fpointer);
+}
+// Displaying the details of the passenger
+void display()
+{
+	cur = head;
+	while (cur)
+	{
+		printf("\n\n Passport Number : %-6s", cur->passport);
+		printf("\n      Name : %-15s", cur->name);
+		printf("\n      Email address: %-15s", cur->email);
+		printf("\n      Seat number: A-%-15d", cur->seat_num);
+		printf("\n      Phone Number: %-15d", cur->phone);
+		printf("\n      Flight: %-15s", cur->flight);
+		printf("\n      Destination: %-15s", cur->dest);
+		printf("\n      Date: %-15s", cur->date);
+		printf("\n\n++=====================================================++");
+		cur = cur->next;
+	}
+
+}
+// Canceling the passenger details
+void cancel()
+{
+	cur = head;
+	char passport[6];
+	printf("\n\n Enter passport number to delete record?: ");
+	gets(passport); fflush(stdin);
+	if (strcmp(head->passport, passport) == 0)
+	{
+		temp = head;
+		head = head->next;
+		free(temp);
+		printf("Booking has been deleted and you have a 5 percent cancellation charges");
+		return;
+
+	}
+
+	while (cur->next)
+	{
+		if (strcmp(cur->next->passport, passport) == 0)
+		{
+			temp = cur->next;
+			cur->next = cur->next->next;
+			free(temp);
+			printf("has been deleted ");
+			getch();
+			return;
+		}
+		cur = cur->next;
+	}
+	printf("Passport number is wrong please check your passport again");
+
+}
